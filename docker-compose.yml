@@ -1,0 +1,32 @@
+version: "3"
+services:
+  traefik:
+    image: traefik:latest
+    command: --web --api --docker --docker.domain=docker.localhost 
+    ports:
+    - "80:80"
+    - "8083:8080"
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+  web:
+    image: jeevaram97/testing:v.0.0.2
+    labels:
+      - "traefik.backend=nodejs"
+      - "traefik.frontend.rule=Host:hello.tricogdev.com;"
+      - "traefik.frontend.port=8000"
+    volumes:
+      - "/home/shreyas/workspace/Docker/:/usr/src/app"
+    ports:
+      - "5001:8000" 
+    depends_on:
+    - traefik 
+  js:
+    image: jeevaram97/anotherservice:react.v0.0.1
+    build:
+      context: "/home/shreyas/workspace/anotherService/"
+    volumes:
+      - "/home/shreyas/workspace/anotherService/dist:/usr/src/app"  
+    labels:
+      - "traefik.backend=jsweb"
+      - "traefik.frontend.rule=Host:hello.tricogdev.com; PathPrefixStrip:/api"
+      # - "traefik.frontend.port=8080"
