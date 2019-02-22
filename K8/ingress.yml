@@ -1,15 +1,20 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: api
+  name: demokube
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.class: traefik
+    traefik.frontend.rule.type: PathPrefixStrip
 spec:
   rules:
-  - host: foo.bar.com
+  - host: demo.kubernets.com
     http:
       paths:
+      - path: /api
+        backend:
+          serviceName: server
+          servicePort: http
       - path: /
         backend:
-          serviceName: api
-          servicePort: 8000
+          serviceName: client
+          servicePort: http

@@ -1,21 +1,52 @@
-apiVersion: apps/v1
+---
 kind: Deployment
+apiVersion: extensions/v1beta1
 metadata:
-  name: api
+  name: server
   labels:
-    app: api
+    app: demo-kube
+    demo-kube: server
 spec:
-  replicas: 4
+  replicas: 2
   selector:
     matchLabels:
-      app: api
+      app: demo-kube
+      task: server
   template:
     metadata:
       labels:
-        app: api
+        app: demo-kube
+        task: server
+        version: v0.0.1
     spec:
       containers:
-      - name: api
+      - name: demo-kube
         image: jeevaram97/testing:v.0.0.2
         ports:
         - containerPort: 8000
+---
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: client
+  labels:
+    app: demo-kube
+    demo-kube: client
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: demo-kube
+      task: client
+  template:
+    metadata:
+      labels:
+        app: demo-kube
+        task: client
+        version: v0.0.1
+    spec:
+      containers:
+      - name: demo-kube
+        image: jeevaram97/anotherservice:react.v.0.0.2
+        ports:
+        - containerPort: 80

@@ -21,11 +21,12 @@ services:
     depends_on:
     - traefik 
   js:
-    image: jeevaram97/anotherservice:react.v0.0.1
+    image: jeevaram97/anotherservice:react.v.0.0.2
     build:
       context: "/home/shreyas/workspace/anotherService/"
     volumes:
-      - "/home/shreyas/workspace/anotherService/dist:/usr/src/app"  
+      - "/home/shreyas/workspace/anotherService/dist:/usr/src/app" 
+      - "/home/shreyas/workspace/anotherService/:/etc/nginx/config.d/default.conf"
     labels:
       - "traefik.backend=jsweb"
       - "traefik.frontend.rule=Host:hello.tricogdev.com; PathPrefixStrip:/api"
