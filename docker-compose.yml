@@ -8,26 +8,33 @@ services:
     - "8083:8080"
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock
-  web:
-    image: jeevaram97/testing:v.0.0.2
+  server:
+    build:
+       context: "/home/jeeva/projects/Docker/"
+     image: jeevaram97/testing:v.0.0.2
+    
     labels:
-      - "traefik.backend=nodejs"
-      - "traefik.frontend.rule=Host:hello.tricogdev.com;"
-      - "traefik.frontend.port=8000"
+      - "traefik.backend=server"
+      - "traefik.frontend.port=5001"
+      - "traefik.frontend.rule=Host:hello.tricogdev.com;PathPrefixStrip:/api"
     volumes:
-      - "/home/shreyas/workspace/Docker/:/usr/src/app"
-    ports:
-      - "5001:8000" 
+      - "/home/jeeva/projects/Docker/:/usr/src/app"
+    # ports:
+    #   - "5001:8000" 
     depends_on:
     - traefik 
-  js:
+  client:
     image: jeevaram97/anotherservice:react.v.0.0.2
     build:
-      context: "/home/shreyas/workspace/anotherService/"
-    volumes:
-      - "/home/shreyas/workspace/anotherService/dist:/usr/src/app" 
-      - "/home/shreyas/workspace/anotherService/:/etc/nginx/config.d/default.conf"
+      context: "/home/jeeva/projects/ReactDocker/"
+    # ports:
+    #   - "8000:80"
+    # volumes:
+    #   - "/home/jeeva/projects/anotherService/dist:/usr/src/app" 
+    #   - "/home/jeeva/projects/anotherService/:/etc/nginx/config.d/default.conf"
     labels:
-      - "traefik.backend=jsweb"
-      - "traefik.frontend.rule=Host:hello.tricogdev.com; PathPrefixStrip:/api"
-      # - "traefik.frontend.port=8080"
+      - "traefik.backend=client"
+      - "traefik.frontend.port=8080"
+      - "traefik.frontend.rule=Host:hello;"
+    depends_on:
+      - traefik
