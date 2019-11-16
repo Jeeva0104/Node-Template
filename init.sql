@@ -1,0 +1,3 @@
+CREATE DATABASE IF NOT EXISTS Demo;
+USE Demo;
+CREATE TABLE Demo (id int); 

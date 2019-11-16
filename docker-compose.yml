@@ -1,40 +1,53 @@
 version: "3"
 services:
   traefik:
-    image: traefik:latest
+    image: traefik:v1.7
     command: --web --api --docker --docker.domain=docker.localhost 
     ports:
     - "80:80"
-    - "8083:8080"
+    - "8084:8080"
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock
   server:
     build:
-       context: "/home/jeeva/projects/Docker/"
-     image: jeevaram97/testing:v.0.0.2
+      context: "${PROJECT_DIR}/Node-Template/"
+    image: jeevaram97/testing:v.0.0.2
     
     labels:
       - "traefik.backend=server"
       - "traefik.frontend.port=5001"
-      - "traefik.frontend.rule=Host:hello.tricogdev.com;PathPrefixStrip:/api"
+      - "traefik.frontend.rule=Host:localhost;PathPrefixStrip:/api"
     volumes:
-      - "/home/jeeva/projects/Docker/:/usr/src/app"
-    # ports:
-    #   - "5001:8000" 
+      - "${PROJECT_DIR}/Node-Template/:/usr/src/app"
+    ports:
+      - "5001:8000" 
     depends_on:
     - traefik 
   client:
-    image: jeevaram97/anotherservice:react.v.0.0.2
+    # image: jeevaram97/anotherservice:react.v.0.0.2
     build:
-      context: "/home/jeeva/projects/ReactDocker/"
-    # ports:
-    #   - "8000:80"
-    # volumes:
-    #   - "/home/jeeva/projects/anotherService/dist:/usr/src/app" 
-    #   - "/home/jeeva/projects/anotherService/:/etc/nginx/config.d/default.conf"
+      context: "${PROJECT_DIR}/React-Template/"
+    ports:
+      - "8001:80"
+    volumes:
+      - "${PROJECT_DIR}/dist:/usr/src/app" 
+      - "${PROJECT_DIR}/:/etc/nginx/config.d/default.conf"
     labels:
       - "traefik.backend=client"
       - "traefik.frontend.port=8080"
-      - "traefik.frontend.rule=Host:hello;"
+      - "traefik.frontend.rule=Host:localhost;"
     depends_on:
       - traefik
+  database:
+    image: mysql:5.7
+    ports:
+      - "3061:3306"
+    command: --init-file ${PROJECT_DIR}/Node-Template/init.sql
+    volumes:
+      - ./init.sql:${PROJECT_DIR}/Node-Template/init.sql
+    environment:
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: root
+      MYSQL_PASSWORD: secret
